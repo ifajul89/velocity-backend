@@ -23,11 +23,11 @@ export default {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
-  SP:{
+  SP: {
     sp_endpoint: process.env.SP_ENDPOINT,
     sp_username: process.env.SP_USERNAME,
     sp_password: process.env.SP_PASSWORD,
     sp_prefix: process.env.SP_PREFIX,
     sp_return_url: process.env.SP_RETURN_URL,
-  }
+  },
 };

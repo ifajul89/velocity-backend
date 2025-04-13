@@ -7,19 +7,21 @@ import { carValidationSchema } from './car.validation';
 import { upload } from '../../utils/sendImageCloudinary';
 const router = express.Router();
 // 1. Create a Car
-router.post('/',
-    auth(USER_ROLE.admin),
-    upload.single('file'),
-    (req: Request, res: Response, next: NextFunction) => {
-        req.body = JSON.parse(req.body.data);
-        // Add file path to body for validation
-        if (req.file) {
-            req.body.image = req.file.path;
-        }
-        next();
-    },
-    validateRequest(carValidationSchema),
-    CarControllers.createCar);
+router.post(
+  '/',
+  auth(USER_ROLE.admin),
+  upload.single('file'),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = JSON.parse(req.body.data);
+    // Add file path to body for validation
+    if (req.file) {
+      req.body.image = req.file.path;
+    }
+    next();
+  },
+  validateRequest(carValidationSchema),
+  CarControllers.createCar,
+);
 // 2. Get All Cars
 router.get('/', CarControllers.getCars);
 // 3. Get a Specific Car

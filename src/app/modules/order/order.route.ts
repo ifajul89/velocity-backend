@@ -7,7 +7,6 @@ import { USER_ROLE } from '../user/user.interface';
 
 const router = express.Router();
 
-
 // Verify payment
 router.get('/verify', auth(USER_ROLE.admin), orderController.verifyPayment);
 
@@ -20,6 +19,4 @@ router.get('/details', auth(USER_ROLE.admin), orderController.getDetails);
 // Get revenue
 router.get('/revenue', auth(USER_ROLE.admin), orderController.getRevenue);
 
-
 export const orderRoutes = router;
-

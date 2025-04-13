@@ -8,21 +8,29 @@ const createOrder = catchAsync(async (req, res) => {
   const user = req.user;
 
   // Check if required customer information is present in the request body
-  const { 
-    customerFirstName, 
-    customerLastName, 
-    email, 
-    phone, 
-    address, 
-    city, 
-    zipCode, 
-    products 
+  const {
+    customerFirstName,
+    customerLastName,
+    email,
+    phone,
+    address,
+    city,
+    zipCode,
+    products,
   } = req.body;
 
-  if (!customerFirstName || !customerLastName || !email || !phone || !address || !city || !zipCode) {
+  if (
+    !customerFirstName ||
+    !customerLastName ||
+    !email ||
+    !phone ||
+    !address ||
+    !city ||
+    !zipCode
+  ) {
     return sendResponse(res, {
       statusCode: httpStatus.BAD_REQUEST,
-      message: "Missing required customer information",
+      message: 'Missing required customer information',
       data: null,
     });
   }
@@ -31,7 +39,7 @@ const createOrder = catchAsync(async (req, res) => {
   if (!products || !Array.isArray(products) || products.length === 0) {
     return sendResponse(res, {
       statusCode: httpStatus.BAD_REQUEST,
-      message: "Order must contain at least one product",
+      message: 'Order must contain at least one product',
       data: null,
     });
   }
@@ -41,7 +49,7 @@ const createOrder = catchAsync(async (req, res) => {
     if (!product.product || !product.quantity || product.quantity <= 0) {
       return sendResponse(res, {
         statusCode: httpStatus.BAD_REQUEST,
-        message: "Each product must have a valid ID and quantity",
+        message: 'Each product must have a valid ID and quantity',
         data: null,
       });
     }
@@ -51,7 +59,7 @@ const createOrder = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Order placed successfully",
+    message: 'Order placed successfully',
     data: order,
   });
 });
@@ -62,41 +70,51 @@ const verifyPayment = catchAsync(async (req, res) => {
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Order verified successfully",
+    message: 'Order verified successfully',
     data: order,
   });
 });
-// get order 
+// get order
 const getOrders = catchAsync(async (req, res) => {
   const order = await orderService.getOrders();
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
-    message: "Order retrieved successfully",
+    message: 'Order retrieved successfully',
     data: order,
   });
 });
 
-const getRevenue = catchAsync(async (_req: Request, res: Response, next: NextFunction) => {
-  const totalRevenue = await orderService.calculateRevenue()
+const getRevenue = catchAsync(
+  async (_req: Request, res: Response, next: NextFunction) => {
+    const totalRevenue = await orderService.calculateRevenue();
 
-  sendResponse(res, {
-    statusCode: (httpStatus.OK),
-    status: true,
-    message: "Total revenue is get successfully",
-    data: totalRevenue
-  })
-});
-const getDetails = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  // const is
-  const details = await orderService.getDetails()
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      status: true,
+      message: 'Total revenue is get successfully',
+      data: totalRevenue,
+    });
+  },
+);
+const getDetails = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // const is
+    const details = await orderService.getDetails();
 
-  sendResponse(res, {
-    statusCode: (httpStatus.OK),
-    status: true,
-    message: "Order details is get successfully",
-    data: details
-  })
-});
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      status: true,
+      message: 'Order details is get successfully',
+      data: details,
+    });
+  },
+);
 
-export const orderController = { createOrder, getRevenue, getDetails, verifyPayment, getOrders };
+export const orderController = {
+  createOrder,
+  getRevenue,
+  getDetails,
+  verifyPayment,
+  getOrders,
+};

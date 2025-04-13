@@ -19,7 +19,7 @@ export interface TOrder {
   tax: number;
   shipping: number;
   totalPrice: number;
-  status: "Pending" | "Paid" | "Shipped" | "Completed" | "Cancelled";
+  status: 'Pending' | 'Paid' | 'Shipped' | 'Completed' | 'Cancelled';
   transaction: {
     id: string;
     transactionStatus: string;

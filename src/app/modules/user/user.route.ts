@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { USER_ROLE } from './user.interface';
 import { userController } from './user.controller';

@@ -43,13 +43,6 @@ import { orderUtils } from './order.utils';
 //   //   totalPrice,
 //   // });
 
-
-
-
-
-
-
-
 //   const totalPrice = Number(quantity * price)
 //   // console.log(productDetails, "To");
 //   let order = await OrderModel.create(productDetails);
@@ -84,23 +77,23 @@ import { orderUtils } from './order.utils';
 
 const createOrder = async (
   user: any,
-  payload: { 
-    products: { product: string; quantity: number; price?: number }[],
-    customerFirstName: string,
-    customerLastName: string,
-    email: string,
-    phone: string,
-    address: string,
-    city: string,
-    zipCode: string
+  payload: {
+    products: { product: string; quantity: number; price?: number }[];
+    customerFirstName: string;
+    customerLastName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    zipCode: string;
   },
-  client_ip: string
+  client_ip: string,
 ) => {
   if (!payload?.products?.length)
-    throw new AppError(httpStatus.NOT_ACCEPTABLE, "Order is not specified");
+    throw new AppError(httpStatus.NOT_ACCEPTABLE, 'Order is not specified');
 
   const products = payload.products;
-  
+
   // Set fixed shipping cost
   const shippingCost = 250;
 
@@ -111,36 +104,36 @@ const createOrder = async (
       if (!product) {
         throw new AppError(
           httpStatus.NOT_FOUND,
-          `Product with ID ${item.product} not found`
+          `Product with ID ${item.product} not found`,
         );
       }
-      
+
       // Use the product price from the database
       const price = product.price || 0;
       const itemSubtotal = price * item.quantity;
       subtotal += itemSubtotal;
-      
+
       return {
         product: item.product,
         quantity: item.quantity,
         price: price,
-        subtotal: itemSubtotal
+        subtotal: itemSubtotal,
       };
-    })
+    }),
   );
-  
+
   // Verify we have valid product details before proceeding
   if (!productDetails.length) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      "No valid products found for this order"
+      'No valid products found for this order',
     );
   }
 
   // Calculate tax (5% of subtotal)
   const taxRate = 0.05;
   const tax = subtotal * taxRate;
-  
+
   // Calculate total price (subtotal + tax + shipping)
   const totalPrice = subtotal + tax + shippingCost;
 
@@ -164,7 +157,7 @@ const createOrder = async (
   if (!order.products || order.products.length === 0) {
     throw new AppError(
       httpStatus.INTERNAL_SERVER_ERROR,
-      "Failed to save products to the order"
+      'Failed to save products to the order',
     );
   }
 
@@ -172,7 +165,7 @@ const createOrder = async (
   const shurjopayPayload = {
     amount: totalPrice,
     order_id: order._id,
-    currency: "BDT",
+    currency: 'BDT',
     customer_name: `${payload.customerFirstName} ${payload.customerLastName}`,
     customer_address: payload.address,
     customer_email: payload.email,
@@ -182,17 +175,20 @@ const createOrder = async (
   };
 
   const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
-  
-  if(payment?.transactionStatus) {
-    await OrderModel.updateOne({ _id: order._id }, {
-      transaction: {
-        id: payment.sp_order_id,
-        transactionStatus: payment.transactionStatus,
+
+  if (payment?.transactionStatus) {
+    await OrderModel.updateOne(
+      { _id: order._id },
+      {
+        transaction: {
+          id: payment.sp_order_id,
+          transactionStatus: payment.transactionStatus,
+        },
       },
-    });
+    );
   }
-  
-  return payment.checkout_url
+
+  return payment.checkout_url;
 };
 
 //   const payment = await orderUtils.makePaymentAsync(shurjopayPayload);
@@ -210,31 +206,29 @@ const createOrder = async (
 // };
 
 const verifyPayment = async (order_id: string) => {
-   const verifiedPayment = await orderUtils.verifyPaymentAsync(order_id);
-   if(verifiedPayment.length){
-    await OrderModel.findOneAndUpdate
-    ( { "transaction.id":order_id },
+  const verifiedPayment = await orderUtils.verifyPaymentAsync(order_id);
+  if (verifiedPayment.length) {
+    await OrderModel.findOneAndUpdate(
+      { 'transaction.id': order_id },
       {
-        "transaction.bank_status":verifiedPayment[0].bank_status,
-        "transaction.sp_code":verifiedPayment[0].sp_code,
-        "transaction.sp_message":verifiedPayment[0].sp_message,
-        "transaction.transaction_status":verifiedPayment[0].transaction_status,
-        "transaction.date_time":verifiedPayment[0].date_time,
-        status:verifiedPayment[0].bank_status === "Success" ?
-         "Paid"
-          : verifiedPayment[0].bank_status === "Failed" ?
-            "Pending"
-             :verifiedPayment[0].bank_status === "Cancel" ?
-              "Cancelled"
-              :""
-      }
-    )
-     
-   
-   }
- 
+        'transaction.bank_status': verifiedPayment[0].bank_status,
+        'transaction.sp_code': verifiedPayment[0].sp_code,
+        'transaction.sp_message': verifiedPayment[0].sp_message,
+        'transaction.transaction_status': verifiedPayment[0].transaction_status,
+        'transaction.date_time': verifiedPayment[0].date_time,
+        status:
+          verifiedPayment[0].bank_status === 'Success'
+            ? 'Paid'
+            : verifiedPayment[0].bank_status === 'Failed'
+              ? 'Pending'
+              : verifiedPayment[0].bank_status === 'Cancel'
+                ? 'Cancelled'
+                : '',
+      },
+    );
+  }
 
-   return verifiedPayment;
+  return verifiedPayment;
 };
 
 const getOrders = async () => {
@@ -256,15 +250,15 @@ const calculateRevenue = async () => {
 };
 
 const getDetails = async () => {
-  const result = await OrderModel.find()
+  const result = await OrderModel.find();
   // console.log(result, "From order service");
-  return result
-}
+  return result;
+};
 
 export const orderService = {
   createOrder,
   calculateRevenue,
   getDetails,
   verifyPayment,
-  getOrders
-}
+  getOrders,
+};
